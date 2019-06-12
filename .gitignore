@@ -1,10 +1,4 @@
 !.gitkeep
-secrets
-configs/ranger/bookmarks
-configs/ranger/history
-configs/ranger/tagged
-bash_it/plugins/enabled/*
-!bash_it/plugins/enabled/.gitkeep
 
 # Created by https://www.gitignore.io/api/vim,osx
 
