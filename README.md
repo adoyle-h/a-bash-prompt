@@ -8,16 +8,19 @@ It is a part of my [Bash dotfiles framework](https://github.com/adoyle-h/dotfile
 
 ## Preview
 
-![preview.png](https://media.githubusercontent.com/media/adoyle-h/_imgs/master/github/dotfiles/preview.png)
+### Responsive prompt (Auto fit to window width).
 
-Responsive UI (Auto fit to window width).
+![responsive-prompt.png](https://media.githubusercontent.com/media/adoyle-h/_imgs/master/github/a-bash-prompt/responsive-prompt.png)
 
-![responsive-ui.png](https://media.githubusercontent.com/media/adoyle-h/_imgs/master/github/dotfiles/responsive-ui.png)
+### Show last command exit status
 
-Highlight Backgound jobs:
+![exit-status.png](https://media.githubusercontent.com/media/adoyle-h/_imgs/master/github/a-bash-prompt/exit-status.png)
 
-![background-jobs.png](https://media.githubusercontent.com/media/adoyle-h/_imgs/master/github/dotfiles/background-jobs.png)
+### Highlight Backgound jobs:
 
+![jobs-labels.png](https://media.githubusercontent.com/media/adoyle-h/_imgs/master/github/a-bash-prompt/jobs-labels.png)
+
+### Quick preview in container
 
 You can easily preview it in container.
 
@@ -122,6 +125,10 @@ Copyright (c) 2019 ADoyle. The project is licensed under the **BSD 3-clause Lice
 See the [LICENSE][] file for the specific language governing permissions and limitations under the License.
 
 See the [NOTICE][] file distributed with this work for additional information regarding copyright ownership.
+
+## Related Projects
+
+- [shell-general-colors](https://github.com/adoyle-h/shell-general-colors): To generate [colors.bash](./colors.bash).
 
 <!-- links -->
 

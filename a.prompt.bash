@@ -3,14 +3,14 @@
 # If not running interactively, don't do anything
 [[ -z "$PS1" ]] && return
 
-# set 0 to disable, set 1 to enable PROMPT_ options
+# Set 0 to disable, set 1 to enable PROMPT_ options
 PROMPT_PS1_SIGNATURE=${PROMPT_PS1_SIGNATURE:-𝕬}
 PROMPT_PS1_LEFT_ICON=${PROMPT_PS1_LEFT_ICON:-'⧉ '}
 PROMPT_NO_COLOR=${PROMPT_NO_COLOR:-0}
 PROMPT_NO_MODIFY_LSCOLORS=${PROMPT_NO_MODIFY_LSCOLORS:-0}
 PROMPT_ENABLE_HISTORY_APPEND=${PROMPT_ENABLE_HISTORY_APPEND:-0}
 
-# set empty string to disable, set non-empty string to enable GIT_ options
+# Set empty string to disable, set non-empty string to enable GIT_ options
 GIT_PS1_SHOWDIRTYSTATE=${GIT_PS1_SHOWDIRTYSTATE:-1}
 GIT_PS1_SHOWSTASHSTATE=${GIT_PS1_SHOWSTASHSTATE:-1}
 GIT_PS1_SHOWUNTRACKEDFILES=${GIT_PS1_SHOWUNTRACKEDFILES:-1}
@@ -34,34 +34,26 @@ source "$(dirname "${BASH_SOURCE[0]}")"/colors.bash
 
 ##### Helper Functions #####
 
-l.cursor_pos() {
-  local CURPOS
-  read -sdR -p $'\E[6n' CURPOS
-  CURPOS=${CURPOS#*[} # Strip decoration characters <ESC>[
-  echo "${CURPOS}"    # Return position in "row;col" format
-}
-
-l.cursor_row() {
-  local COL
-  local ROW
-  IFS=';' read -sdR -p $'\E[6n' ROW COL
-  echo "${ROW#*[}"
-}
-
-l.cursor_col() {
-  local COL
-  local ROW
-  IFS=';' read -sdR -p $'\E[6n' ROW COL
-  echo "${COL}"
+__prompt_debug() {
+  echo "$@" >> ~/prompt_debug
 }
 
 # http://jafrog.com/2013/11/23/colors-in-terminal.html
-__trim_str_color() {
+__prompt_trim_str_color() {
   local ecs=$'\e'
   sed -E "s,${ecs}[[0-9]*(;[0-9]+)*m,,g" <<< "$1"
 }
 
-__check_precmd_conflict() {
+# Wrapping in \[ \] is recommended by the Bash man page.
+# This helps Bash ignore non-printable characters so that it correctly calculates the size of the prompt.
+__prompt_wrap_color() {
+  local ecs=$'\e'
+  local start='\\['
+  local end='\\]'
+  sed -E "s,${ecs}[[0-9]*(;[0-9]+)*m,${start}\\0${end},g" <<< "$1"
+}
+
+__prompt_check_precmd_conflict() {
   local f
   for f in "${precmd_functions[@]}"; do
     if [[ "${f}" == "${1}" ]]; then
@@ -77,7 +69,7 @@ __prompt_append() {
 
   if [ "${__bp_imported:-}" == "defined" ]; then
     # We are using bash-preexec
-    if ! __check_precmd_conflict "${1}" ; then
+    if ! __prompt_check_precmd_conflict "${1}" ; then
       precmd_functions+=("${1}")
     fi
   else
@@ -108,7 +100,7 @@ __prompt_append() {
 __ps1_section_exit_status() {
   local exit_status=$__ps1_last_exit_status
   if [[ $exit_status != 0 ]]; then
-    printf '%s' "${__prompt_RED}[😱 $exit_status]"
+    printf '%b' "${__prompt_RED}[😱 $exit_status]"
   fi
 }
 
@@ -146,41 +138,40 @@ __ps1_section_indicator() {
 }
 
 __ps1_section_fill_middle_spaces() {
-  local PS1_left=$1
-  local PS1_right=$2
-  local PS1_left_plain=$(__trim_str_color "$PS1_left")
-  local PS1_right_plain=$(__trim_str_color "$PS1_right")
-  local -i doubleByteCharLen=$(grep -oE $'[\u4e00-\u9fa5]' <<< "$PS1_left_plain" | wc -l | tr -d ' ' || echo 0)
-  (( doubleByteCharLen > 0 )) && ((doubleByteCharLen-=2))
-  local -i COLS=$(( COLUMNS - ${#PS1_left_plain} - ${#PS1_right_plain} - doubleByteCharLen ))
-
   # For debug
-  # echo "COLUMNS=$COLUMNS" >> ~/prompt_debug
-  # echo "PS1_left.len=${#PS1_left} PS1_left_plain.len=${#PS1_left_plain}" >> ~/prompt_debug
-  # echo "PS1_right.len=${#PS1_right} PS1_right_plain.len=${#PS1_right_plain}" >> ~/prompt_debug
-  # echo "doubleByteCharLen=$doubleByteCharLen" >> ~/prompt_debug
-  # echo "COLS=$COLS" >> ~/prompt_debug
-  # echo -e "PS1_left=$PS1_left" >> ~/prompt_debug
-  # echo -e "PS1_right=$PS1_right" >> ~/prompt_debug
-  # echo -e "PS1_left_plain=$PS1_left_plain" >> ~/prompt_debug
-  # echo -e "PS1_right_plain=$PS1_right_plain" >> ~/prompt_debug
+  # local left=$1
+  # local right=$2
+  # local left_plain=$(__prompt_trim_str_color "$left")
+  # local right_plain=$(__prompt_trim_str_color "$right")
+  # local -i leftDbCharLen=$(grep -oE $'[\u4e00-\u9fa5]' <<< "$left_plain" | wc -l | tr -d ' ' || true)
+  # local -i rightDbCharLen=$(grep -oE $'[\u4e00-\u9fa5]' <<< "$right_plain" | wc -l | tr -d ' ' || true)
+  # local -i COLS=$(( COLUMNS - ${#left_plain} - ${#right_plain} - leftDbCharLen - rightDbCharLen ))
 
-  if [[ -n "${TMUX:-}" ]]; then
-    COLS=$(( COLS - 1 ))
-  fi
+  # __prompt_debug "COLUMNS=$COLUMNS"
+  # __prompt_debug "left.len=${#left} left_plain.len=${#left_plain}"
+  # __prompt_debug "right.len=${#right} right_plain.len=${#right_plain}"
+  # __prompt_debug "leftDbCharLen=$leftDbCharLen rightDbCharLen=$rightDbCharLen"
+  # __prompt_debug "COLS=$COLS"
+  # __prompt_debug -e "left=$left"
+  # __prompt_debug -e "right=$right"
+  # __prompt_debug -e "left_plain=$left_plain"
+  # __prompt_debug -e "right_plain=$right_plain"
+
+  local plain=$(__prompt_trim_str_color "$1$2")
+  local dbCharLen=$(grep -oE $'[\u4e00-\u9fa5😱]' <<< "$plain" | wc -l | tr -d ' ' || true)
+  local -i COLS=$(( COLUMNS - ${#plain} - dbCharLen ))
 
   if (( COLS < 1 )); then
-    printf '\n %s' "${__prompt_GREEN}➥"
-    return 0
+    printf '\n %b' "${__prompt_GREEN}➥"
+  else
+    local LINE=''
+    local CHAR='—'
+    while (( ${#LINE} < COLS )); do
+      LINE="$LINE$CHAR"
+    done
+
+    printf '%b' "${__prompt_GREY}${LINE}"
   fi
-
-  local LINE=''
-  local CHAR='—'
-  while (( ${#LINE} < COLS )); do
-    LINE="$LINE$CHAR"
-  done
-
-  printf '%b' "${__prompt_GREY}${LINE}"
 }
 
 __ps1_section_reset_text() {
@@ -193,13 +184,12 @@ __ps1_section_reset_text() {
 ##### Command Definitions #####
 
 __ps1_command_append_history() {
-  history -a
+  [[ $PROMPT_ENABLE_HISTORY_APPEND == 1 ]] && history -a
 }
 
 ###############################
 
 __ps1_right() {
-  # __ps1_section_exit_status must be first, because $? used
   __ps1_section_exit_status
   __ps1_section_jobs
   __ps1_section_time
@@ -217,15 +207,18 @@ __ps1_main() {
 }
 
 __prompt_command() {
+  # This line must be first
+  local __ps1_last_exit_status=$?
+
   if [[ -z ${PROMPT_PS1:-} ]]; then
-    local __ps1_last_exit_status=$?
-    local PS1_right="$(__ps1_right)"
-    local PS1_left="$(__ps1_left)"
-    local PS1_middle="$(__ps1_section_fill_middle_spaces "${PS1_left}" "${PS1_right}")"
-    local _PS1="$PS1_left$PS1_middle$PS1_right\\n$(__ps1_main)${C_RESET_ALL} "
+    local right="$(__ps1_right)"
+    local left="$(__ps1_left)"
+    local middle="$(__ps1_section_fill_middle_spaces "${left}" "${right}")"
+    local main=$(__ps1_main)
+    local _PS1="$left$middle$right\\n$(__prompt_wrap_color "$main") "
 
     if [[ $PROMPT_NO_COLOR == 1 ]]; then
-      _PS1=$(__trim_str_color "$_PS1")
+      _PS1=$(__prompt_trim_str_color "$_PS1")
     fi
 
     PS1=$_PS1
@@ -233,7 +226,7 @@ __prompt_command() {
     PS1=$PROMPT_PS1
   fi
 
-  [[ $PROMPT_ENABLE_HISTORY_APPEND == 1 ]] && history -a
+  __ps1_command_append_history
 }
 
 __prompt_append __prompt_command
