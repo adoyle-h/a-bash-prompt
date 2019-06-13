@@ -1,4 +1,4 @@
-FROM bash:4.4
+FROM bash:$VERSION
 
 LABEL maintainer="ADoyle <adoyle.h@gmail.com>"
 WORKDIR /bash

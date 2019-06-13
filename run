@@ -10,4 +10,4 @@ shopt -s inherit_errexit
 
 readonly SCRIPT_DIR="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
 
-docker run --env-file "$SCRIPT_DIR"/docker.env --rm -it a-bash-prompt
+docker run --env-file "$SCRIPT_DIR"/docker.env --rm -it a-bash-prompt:"${1:-4.4}"

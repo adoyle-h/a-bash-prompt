@@ -2,6 +2,8 @@
 
 A Bash prompt written by pure Bash script.
 
+Support Bash 4.2 and higher, 5.x.
+
 It is a part of my [Bash dotfiles framework](https://github.com/adoyle-h/dotfiles).
 
 ## Preview
@@ -20,10 +22,14 @@ Highlight Backgound jobs:
 You can easily preview it in container.
 
 ```sh
-# build docker image
+# build docker image (default bash 4.4)
 ./build
-# run and enter container
+# run and enter container (default bash 4.4)
 ./run
+
+# or build with specific bash version
+./build 5.0
+./run 5.0
 ```
 
 ## Versioning
@@ -35,10 +41,6 @@ The versioning follows the rules of SemVer 2.0.0.
 **Attentions**: anything may have **BREAKING CHANGES** at **ANY TIME** when major version is zero (0.y.z), which is for initial development and the public API should be considered unstable.
 
 For more information on SemVer, please visit http://semver.org/.
-
-## Dependency
-
-- Bash 4.4 and higher.
 
 ## Usage
 

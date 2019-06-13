@@ -8,4 +8,12 @@ shopt -s inherit_errexit
 [[ -n "${VERBOSE:+x}" ]] && set -o verbose
 [[ -n "${DEBUG:-}" ]] && IS_DEBUG=true || IS_DEBUG=false
 
-docker build -t a-bash-prompt .
+readonly SCRIPT_DIR="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
+
+main() {
+  export VERSION="${1:-4.4}"
+  (( $# > 0 )) && shift
+  envsubst < "$SCRIPT_DIR"/Dockerfile | docker build "$@" -t a-bash-prompt:"$VERSION" -f - .
+}
+
+main "$@"
