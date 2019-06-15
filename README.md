@@ -1,6 +1,6 @@
 # A Bash Prompt
 
-A Bash prompt written by pure Bash script.
+A Bash prompt written by pure Bash script. Make Bash great again!
 
 Support Bash 4.2 and higher, 5.x.
 
@@ -37,7 +37,7 @@ You can easily preview it in container.
 
 ## Versioning
 
-No version yet.
+See git [release tags][].
 
 The versioning follows the rules of SemVer 2.0.0.
 
@@ -133,5 +133,6 @@ See the [NOTICE][] file distributed with this work for additional information re
 <!-- links -->
 
 [issue]: https://github.com/adoyle-h/a-bash-prompt/issues
+[release tags]: https://github.com/adoyle-h/a-bash-prompt/releases
 [LICENSE]: ./LICENSE
 [NOTICE]: ./NOTICE
