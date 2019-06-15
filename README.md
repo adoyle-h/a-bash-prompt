@@ -35,16 +35,6 @@ You can easily preview it in container.
 ./run 5.0
 ```
 
-## Versioning
-
-See git [release tags][].
-
-The versioning follows the rules of SemVer 2.0.0.
-
-**Attentions**: anything may have **BREAKING CHANGES** at **ANY TIME** when major version is zero (0.y.z), which is for initial development and the public API should be considered unstable.
-
-For more information on SemVer, please visit http://semver.org/.
-
 ## Usage
 
 Put this line in your `.bahsrc`.
@@ -117,6 +107,16 @@ Set `PROMPT_ENABLE_HISTORY_APPEND=1` to refresh bash_history each command.
 ## Suggestion, Bug Reporting, Contributing
 
 Any suggestions and contributions are always welcome. Please open an [issue][] to talk with me.
+
+## Versioning
+
+See git [release tags][].
+
+The versioning follows the rules of SemVer 2.0.0.
+
+**Attentions**: anything may have **BREAKING CHANGES** at **ANY TIME** when major version is zero (0.y.z), which is for initial development and the public API should be considered unstable.
+
+For more information on SemVer, please visit http://semver.org/.
 
 ## Copyright and License
 
