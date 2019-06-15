@@ -34,6 +34,20 @@ source "$(dirname "${BASH_SOURCE[0]}")"/colors.bash
 
 ##### Helper Functions #####
 
+if [[ $(uname -s) == Darwin ]]; then
+  # grep not support unicode well in MacOS. So use perl instead of.
+  __prompt_fix_middle_length() {
+    local raw=$1
+    # Match Chinese and Emoji characters
+    local l=$(perl -CS -pe 's/[\x{4E00}-\x{9FA5}\x{1F601}-\x{1F64F}]+//g' <<< "$raw");
+    printf '%s\n' "$(( ${#raw} - ${#l} ))"
+  }
+else
+  __prompt_fix_middle_length() {
+    grep -oE $'[\u4e00-\u9fa5😱]' <<< "$plain" | wc -l | tr -d ' ' || true
+  }
+fi
+
 __prompt_debug() {
   echo "$@" >> ~/prompt_debug
 }
@@ -158,8 +172,8 @@ __ps1_section_fill_middle_spaces() {
   # __prompt_debug -e "right_plain=$right_plain"
 
   local plain=$(__prompt_trim_str_color "$1$2")
-  local dbCharLen=$(grep -oE $'[\u4e00-\u9fa5😱]' <<< "$plain" | wc -l | tr -d ' ' || true)
-  local -i COLS=$(( COLUMNS - ${#plain} - dbCharLen ))
+  local fixLen=$(__prompt_fix_middle_length "$plain")
+  local -i COLS=$(( COLUMNS - ${#plain} - fixLen ))
 
   if (( COLS < 1 )); then
     printf '\n %b' "${__prompt_GREEN}➥"
