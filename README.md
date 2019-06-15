@@ -91,6 +91,8 @@ PROMPT_PS1='\u@\h:\w\$ '
 
 Set `PROMPT_NO_COLOR=1`.
 
+![no-color.png](https://media.githubusercontent.com/media/adoyle-h/_imgs/master/github/a-bash-prompt/no-color.png)
+
 ### Do not modify LS_COLORS variable
 
 a-bash-prompt will modify `LSCOLORS` and `LS_COLORS` by default.
