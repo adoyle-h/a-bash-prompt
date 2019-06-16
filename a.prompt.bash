@@ -32,9 +32,11 @@ fi
 
 source "$(dirname "${BASH_SOURCE[0]}")"/colors.bash
 
+__prompt_os_kernel=$(uname -s)
+
 ##### Helper Functions #####
 
-if [[ $(uname -s) == Darwin ]]; then
+if [[ $__prompt_os_kernel == Darwin ]]; then
   # grep not support unicode well in MacOS. So use perl instead of.
   __prompt_fix_middle_length() {
     local raw=$1
@@ -55,7 +57,12 @@ __prompt_debug() {
 # http://jafrog.com/2013/11/23/colors-in-terminal.html
 __prompt_trim_str_color() {
   local ecs=$'\e'
-  sed -E "s,${ecs}[[0-9]*(;[0-9]+)*m,,g" <<< "$1"
+  if [[ $__prompt_os_kernel == Darwin ]]; then
+    # awful BSD sed
+    sed -E "s,\\${ecs}[[0-9]*(;[0-9]+)*m,,g" <<< "$1"
+  else
+    sed -E "s,${ecs}[[0-9]*(;[0-9]+)*m,,g" <<< "$1"
+  fi
 }
 
 # Wrapping in \[ \] is recommended by the Bash man page.
@@ -64,7 +71,11 @@ __prompt_wrap_color() {
   local ecs=$'\e'
   local start='\\['
   local end='\\]'
-  sed -E "s,${ecs}[[0-9]*(;[0-9]+)*m,${start}\\0${end},g" <<< "$1"
+  if [[ $__prompt_os_kernel == Darwin ]]; then
+    sed -E "s,\\${ecs}[[0-9]*(;[0-9]+)*m,${start}&${end},g" <<< "$1"
+  else
+    sed -E "s,${ecs}[[0-9]*(;[0-9]+)*m,${start}\\0${end},g" <<< "$1"
+  fi
 }
 
 __prompt_check_precmd_conflict() {

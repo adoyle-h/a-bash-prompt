@@ -2,8 +2,6 @@
 
 A Bash prompt written by pure Bash script. Make Bash great again!
 
-Support Bash 4.2 and higher, 5.x.
-
 It is a part of my [Bash dotfiles framework](https://github.com/adoyle-h/dotfiles).
 
 ## Preview
@@ -34,6 +32,26 @@ You can easily preview it in container.
 ./build 5.0
 ./run 5.0
 ```
+
+## Prerequisites
+
+### Supported Platform
+
+| Supported | Platform | Version | Main Reasons                       |
+|:---------:|:---------|:--------|:-----------------------------------|
+|     ✅    | MacOS    | *       | -                                  |
+|     ✅    | Linux    | *       | -                                  |
+|     ❔    | BSD      | -       | Not tested yet. Maybe not support. |
+|     🚫    | Windows  | -       | Never and ever supported.          |
+
+### Supported Shells
+
+| Supported | Shell | Version          | Main Reasons                                |
+|:---------:|:------|:-----------------|:--------------------------------------------|
+|     ❔    | Zsh   | v5 and higher    | Not tested yet.                             |
+|     ✅    | Bash  | v5 and higher    | -                                           |
+|     ✅    | Bash  | v4.2 and higher  | -                                           |
+|     🚫    | Bash  | v3.x, v4.0, v4.1 | Associative array not supported  until v4.0 |
 
 ## Usage
 
