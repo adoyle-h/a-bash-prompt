@@ -85,6 +85,17 @@ GIT_PS1_STATESEPARATOR=' '
 
 You can set the variables to override defaults before source `a.prompt.bash`.
 
+### Enable auto-suggestion
+
+Enable Bash auto-suggestion like Zsh. First load [bash-preexec](https://github.com/rcaloras/bash-preexec) by yourself.
+
+```sh
+# load bash-preexec.sh before a.prompt.bash by yourself
+source <path-to-bash-preexec>/bash-preexec.sh
+# a.prompt.bash will open auto-suggestion when bash-preexec sourced
+source <absolute-path>/a.prompt.bash
+```
+
 ### Git-prompt is slow
 
 If you feel slow in git directory. Disable these options will make it faster.

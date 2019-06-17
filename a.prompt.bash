@@ -30,7 +30,9 @@ if [[ "$PROMPT_NO_COLOR" != 1 ]]; then
   fi
 fi
 
-source "$(dirname "${BASH_SOURCE[0]}")"/colors.bash
+CUR_DIR="$(dirname "${BASH_SOURCE[0]}")"
+# shellcheck source=colors.bash
+source "$CUR_DIR/colors.bash"
 
 __prompt_os_kernel=$(uname -s)
 
@@ -214,6 +216,21 @@ __ps1_command_append_history() {
 
 ###############################
 
+
+##### Preexec Definitions #####
+
+__prompt_preexec() {
+  return
+  # variables in HISTIGNORE will be not passed to $1.
+  # echo "just typed $1"
+}
+
+if [ "${__bp_imported:-}" == "defined" ]; then
+  preexec_functions+=(__prompt_preexec)
+fi
+
+###############################
+
 __ps1_right() {
   __ps1_section_exit_status
   __ps1_section_jobs
@@ -255,3 +272,5 @@ __prompt_command() {
 }
 
 __prompt_append __prompt_command
+
+unset CUR_DIR
