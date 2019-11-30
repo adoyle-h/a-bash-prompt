@@ -107,9 +107,9 @@ __prompt_append() {
       prompt_re="\\<${1}\\>"
     fi
 
-    if [[ ${PROMPT_COMMAND} =~ ${prompt_re} ]]; then
+    if [[ ${PROMPT_COMMAND:-} =~ ${prompt_re} ]]; then
       return
-    elif [[ -z ${PROMPT_COMMAND} ]]; then
+    elif [[ -z ${PROMPT_COMMAND:-} ]]; then
       PROMPT_COMMAND="${1}"
     else
       PROMPT_COMMAND="${1};${PROMPT_COMMAND}"
