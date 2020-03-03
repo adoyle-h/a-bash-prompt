@@ -34,7 +34,10 @@ source "$(dirname "${BASH_SOURCE[0]}")"/colors.bash
 
 __prompt_os_kernel=$(uname -s)
 
-##### Helper Functions #####
+
+#######################################################################
+#                          Helper Fcuntions                           #
+#######################################################################
 
 if [[ $__prompt_os_kernel == Darwin ]]; then
   # grep not support unicode well in MacOS. So use perl instead of.
@@ -117,10 +120,10 @@ __prompt_append() {
   fi
 }
 
-############################
 
-
-##### Section Definitions #####
+#######################################################################
+#                         Section Definitions                         #
+#######################################################################
 
 __ps1_section_exit_status() {
   local exit_status=$__ps1_last_exit_status
@@ -132,12 +135,10 @@ __ps1_section_exit_status() {
 __ps1_section_jobs() {
   local stopped=$(jobs -sp | wc -l | tr -d ' ')
   local running=$(jobs -rp | wc -l | tr -d ' ')
-  local sC=''
-  local rC=''
-  [[ $stopped -gt 0 ]] && sC="$__prompt_YELLOW"
-  [[ $running -gt 0 ]] && rC="$__prompt_GREEN"
 
-  printf '%b' "${__prompt_GREY}[${rC}${running}r${__prompt_GREY}/${sC}${stopped}s${__prompt_GREY}]"
+  if (( running > 0 )) || (( stopped > 0 )); then
+    printf '%b' "${__prompt_GREY}[${__prompt_GREEN}Jobs ${running}${__prompt_GREY}/${__prompt_CYAN}${stopped}${__prompt_GREY}]"
+  fi
 }
 
 __ps1_section_time() {
@@ -203,16 +204,18 @@ __ps1_section_reset_text() {
   printf '%b' "${__prompt_RESET_ALL}"
 }
 
-###############################
 
-
-##### Command Definitions #####
+#######################################################################
+#                         Command Definitions                         #
+#######################################################################
 
 __ps1_command_append_history() {
   [[ $PROMPT_ENABLE_HISTORY_APPEND == 1 ]] && history -a
 }
 
-###############################
+#######################################################################
+#                            Presentation                             #
+#######################################################################
 
 __ps1_right() {
   __ps1_section_exit_status
