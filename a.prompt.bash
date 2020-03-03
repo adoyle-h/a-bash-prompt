@@ -205,6 +205,30 @@ __ps1_section_reset_text() {
 }
 
 
+__ps1_section_took_time_record() {
+  __ps1_section_took_time_last_time=$(date +%s)
+}
+
+__ps1_section_took_time_init() {
+  if [ "${__bp_imported:-}" != "defined" ]; then
+    echo "WARNING: took_time section is dependent on bash-preexec" >&2
+    return
+  fi
+  preexec_functions+=(__ps1_section_took_time_record)
+  __ps1_section_took_time_last_time=$(date +%s)
+}
+
+__ps1_section_took_time() {
+  local now=$(date +%s)
+  local last=${__ps1_section_took_time_last_time}
+  local elapse=$(( now - last ))
+  # If the command takes time over 5 seconds, show the section.
+  if (( elapse > 5 )); then
+    printf '%b[%ss]' "${__prompt_PURPLE}" "$elapse"
+  fi
+}
+
+
 #######################################################################
 #                         Command Definitions                         #
 #######################################################################
@@ -219,6 +243,7 @@ __ps1_command_append_history() {
 
 __ps1_right() {
   __ps1_section_exit_status
+  __ps1_section_took_time
   __ps1_section_jobs
   __ps1_section_time
 }
@@ -255,6 +280,7 @@ __prompt_command() {
   fi
 
   __ps1_command_append_history
+  __ps1_section_took_time_init
 }
 
 __prompt_append __prompt_command
