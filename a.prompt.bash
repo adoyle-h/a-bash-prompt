@@ -137,7 +137,7 @@ __ps1_section_jobs() {
   local running=$(jobs -rp | wc -l | tr -d ' ')
 
   if (( running > 0 )) || (( stopped > 0 )); then
-    printf '%b' "${__prompt_GREY}[${__prompt_GREEN}Jobs ${running}${__prompt_GREY}/${__prompt_CYAN}${stopped}${__prompt_GREY}]"
+    printf '%b' "${__prompt_GREY}[${__prompt_GREEN}Jobs ${running}${__prompt_GREY}|${__prompt_CYAN}${stopped}${__prompt_GREY}]"
   fi
 }
 

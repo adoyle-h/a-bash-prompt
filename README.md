@@ -97,6 +97,8 @@ GIT_PS1_SHOWUNTRACKEDFILES=
 
 See https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
 
+You can also disable git-prompt completely by `unset __git_ps1`.
+
 ### Override PS1
 
 If `PROMPT_PS1` set, the PS1 in framework will be override by `PROMPT_PS1`.
