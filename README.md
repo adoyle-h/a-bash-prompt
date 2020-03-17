@@ -72,6 +72,7 @@ PROMPT_NO_COLOR=0
 PROMPT_ENABLE_HISTORY_APPEND=0
 PROMPT_NO_MODIFY_LSCOLORS=0
 PROMPT_PS1=
+PROMPT_PYTHON_VIRTUALENV_LEFT='venv:'
 
 # See https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
 GIT_PS1_SHOWDIRTYSTATE=1

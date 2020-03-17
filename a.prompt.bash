@@ -9,6 +9,7 @@ PROMPT_PS1_LEFT_ICON=${PROMPT_PS1_LEFT_ICON:-'⧉ '}
 PROMPT_NO_COLOR=${PROMPT_NO_COLOR:-0}
 PROMPT_NO_MODIFY_LSCOLORS=${PROMPT_NO_MODIFY_LSCOLORS:-0}
 PROMPT_ENABLE_HISTORY_APPEND=${PROMPT_ENABLE_HISTORY_APPEND:-0}
+PROMPT_PYTHON_VIRTUALENV_LEFT=${PROMPT_PYTHON_VIRTUALENV_LEFT:-venv:}
 
 # Set empty string to disable, set non-empty string to enable GIT_ options
 GIT_PS1_SHOWDIRTYSTATE=${GIT_PS1_SHOWDIRTYSTATE:-1}
@@ -204,6 +205,11 @@ __ps1_section_reset_text() {
   printf '%b' "${__prompt_RESET_ALL}"
 }
 
+__ps1_section_python_virtualenv() {
+  if [[ -n "$VIRTUAL_ENV" ]]; then
+    printf '%b%s' "$__prompt_PURPLE" "[$PROMPT_PYTHON_VIRTUALENV_LEFT ${VIRTUAL_ENV##*/}]"
+  fi
+}
 
 #######################################################################
 #                         Command Definitions                         #
@@ -220,6 +226,7 @@ __ps1_command_append_history() {
 __ps1_right() {
   __ps1_section_exit_status
   __ps1_section_jobs
+  __ps1_section_python_virtualenv
   __ps1_section_time
 }
 
