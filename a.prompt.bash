@@ -35,7 +35,6 @@ source "$(dirname "${BASH_SOURCE[0]}")"/colors.bash
 
 __prompt_os_kernel=$(uname -s)
 
-
 #######################################################################
 #                          Helper Fcuntions                           #
 #######################################################################
@@ -45,17 +44,17 @@ if [[ $__prompt_os_kernel == Darwin ]]; then
   __prompt_fix_middle_length() {
     local raw=$1
     # Match Chinese and Emoji characters
-    local l=$(perl -CS -pe 's/[\x{4E00}-\x{9FA5}\x{1F601}-\x{1F64F}]+//g' <<< "$raw");
-    printf '%s\n' "$(( ${#raw} - ${#l} ))"
+    local l=$(perl -CS -pe 's/[\x{4E00}-\x{9FA5}\x{1F601}-\x{1F64F}]+//g' <<<"$raw")
+    printf '%s\n' "$((${#raw} - ${#l}))"
   }
 else
   __prompt_fix_middle_length() {
-    grep -oE $'[\u4e00-\u9fa5😱]' <<< "$plain" | wc -l | tr -d ' ' || true
+    grep -oE $'[\u4e00-\u9fa5😱]' <<<"$plain" | wc -l | tr -d ' ' || true
   }
 fi
 
 __prompt_debug() {
-  echo "$@" >> ~/prompt_debug
+  echo "$@" >>~/prompt_debug
 }
 
 # http://jafrog.com/2013/11/23/colors-in-terminal.html
@@ -63,9 +62,9 @@ __prompt_trim_str_color() {
   local ecs=$'\e'
   if [[ $__prompt_os_kernel == Darwin ]]; then
     # awful BSD sed
-    sed -E "s,\\${ecs}[[0-9]*(;[0-9]+)*m,,g" <<< "$1"
+    sed -E "s,\\${ecs}[[0-9]*(;[0-9]+)*m,,g" <<<"$1"
   else
-    sed -E "s,${ecs}[[0-9]*(;[0-9]+)*m,,g" <<< "$1"
+    sed -E "s,${ecs}[[0-9]*(;[0-9]+)*m,,g" <<<"$1"
   fi
 }
 
@@ -76,9 +75,9 @@ __prompt_wrap_color() {
   local start='\\['
   local end='\\]'
   if [[ $__prompt_os_kernel == Darwin ]]; then
-    sed -E "s,\\${ecs}[[0-9]*(;[0-9]+)*m,${start}&${end},g" <<< "$1"
+    sed -E "s,\\${ecs}[[0-9]*(;[0-9]+)*m,${start}&${end},g" <<<"$1"
   else
-    sed -E "s,${ecs}[[0-9]*(;[0-9]+)*m,${start}\\0${end},g" <<< "$1"
+    sed -E "s,${ecs}[[0-9]*(;[0-9]+)*m,${start}\\0${end},g" <<<"$1"
   fi
 }
 
@@ -98,7 +97,7 @@ __prompt_append() {
 
   if [ "${__bp_imported:-}" == "defined" ]; then
     # We are using bash-preexec
-    if ! __prompt_check_precmd_conflict "${1}" ; then
+    if ! __prompt_check_precmd_conflict "${1}"; then
       precmd_functions+=("${1}")
     fi
   else
@@ -151,11 +150,15 @@ __ps1_section_left_icon() {
 }
 
 __ps1_section_cwd() {
-  printf '%b' "${__prompt_GREY}[ ${__prompt_GREEN}$(pwd) ${__prompt_GREY}]"
+  if [[ $PROMPT_STYLE_CWD == bubble ]]; then
+    printf '%b%b%s%b%b' "${__prompt_GREEN}" "${__prompt_BG_GREEN}${__prompt_BLACK}" "$(pwd)" "${__prompt_BG_BLACK}${__prompt_GREEN}" "${__prompt_RESET_ALL}"
+  else
+    printf '%b[ %b%s %b]' "${__prompt_GREY}" "${__prompt_GREEN}" "$(pwd)" "${__prompt_GREY}"
+  fi
 }
 
 __ps1_section_git() {
-  if command -v __git_ps1 &>/dev/null ; then
+  if command -v __git_ps1 &>/dev/null; then
     printf '%b' "${__prompt_BLUE}$(__git_ps1 " (%s)")"
   fi
 }
@@ -186,14 +189,14 @@ __ps1_section_fill_middle_spaces() {
 
   local plain=$(__prompt_trim_str_color "$1$2")
   local fixLen=$(__prompt_fix_middle_length "$plain")
-  local -i COLS=$(( COLUMNS - ${#plain} - fixLen ))
+  local -i COLS=$((COLUMNS - ${#plain} - fixLen))
 
-  if (( COLS < 1 )); then
+  if ((COLS < 1)); then
     printf '\n %b' "${__prompt_GREEN}➥"
   else
     local LINE=''
     local CHAR='—'
-    while (( ${#LINE} < COLS )); do
+    while ((${#LINE} < COLS)); do
       LINE="$LINE$CHAR"
     done
 
