@@ -6,6 +6,10 @@
 # Set 0 to disable, set 1 to enable PROMPT_ options
 PROMPT_PS1_SIGNATURE=${PROMPT_PS1_SIGNATURE:-𝕬}
 PROMPT_PS1_LEFT_ICON=${PROMPT_PS1_LEFT_ICON:-'⧉ '}
+PROMPT_STYLE_CWD=${PROMPT_STYLE_CWD:-block}                 # bubble or block
+PROMPT_STYLE_TIME=${PROMPT_STYLE_TIME:-block}               # bubble or block
+PROMPT_STYLE_EXIT_STATUS=${PROMPT_STYLE_EXIT_STATUS:-block} # bubble or block
+PROMPT_STYLE_JOB=${PROMPT_STYLE_JOB:-block}                 # bubble or block
 PROMPT_NO_COLOR=${PROMPT_NO_COLOR:-0}
 PROMPT_NO_MODIFY_LSCOLORS=${PROMPT_NO_MODIFY_LSCOLORS:-0}
 PROMPT_ENABLE_HISTORY_APPEND=${PROMPT_ENABLE_HISTORY_APPEND:-0}
@@ -120,15 +124,19 @@ __prompt_append() {
   fi
 }
 
-
 #######################################################################
 #                         Section Definitions                         #
 #######################################################################
 
 __ps1_section_exit_status() {
   local exit_status=$__ps1_last_exit_status
+
   if [[ $exit_status != 0 ]]; then
-    printf '%b' "${__prompt_RED}[😱 $exit_status]"
+    if [[ $PROMPT_STYLE_EXIT_STATUS == bubble ]]; then
+      printf '%b%b%s%b' "${__prompt_RED}" "${__prompt_BG_RED}${__prompt_BLACK}" "😱 $exit_status" "${__prompt_BG_BLACK}${__prompt_RED}"
+    else
+      printf '%b' "${__prompt_RED}[😱 $exit_status]"
+    fi
   fi
 }
 
@@ -136,13 +144,21 @@ __ps1_section_jobs() {
   local stopped=$(jobs -sp | wc -l | tr -d ' ')
   local running=$(jobs -rp | wc -l | tr -d ' ')
 
-  if (( running > 0 )) || (( stopped > 0 )); then
-    printf '%b' "${__prompt_GREY}[${__prompt_GREEN}Jobs ${running}${__prompt_GREY}|${__prompt_CYAN}${stopped}${__prompt_GREY}]"
+  if ((running > 0)) || ((stopped > 0)); then
+    if [[ $PROMPT_STYLE_JOB == bubble ]]; then
+      printf '%b%b%b' "${__prompt_CYAN}" "${__prompt_BG_CYAN}${__prompt_BLACK}Jobs ${running:-0}|${stopped:-0}" "${__prompt_BG_BLACK}${__prompt_CYAN}"
+    else
+      printf '%b' "${__prompt_GREY}[${__prompt_GREEN}Jobs ${running}${__prompt_GREY}|${__prompt_CYAN}${stopped}${__prompt_GREY}]"
+    fi
   fi
 }
 
 __ps1_section_time() {
-  printf '%b[T%s]' "${__prompt_YELLOW}" "$(date +'%H:%M:%S')"
+  if [[ $PROMPT_STYLE_TIME == bubble ]]; then
+    printf '%b%b%s%b' "${__prompt_YELLOW}" "${__prompt_BG_YELLOW}${__prompt_BLACK}" "T$(date +'%H:%M:%S')" "${__prompt_BG_BLACK}${__prompt_YELLOW}"
+  else
+    printf '%b[%s]' "${__prompt_YELLOW}" "T$(date +'%H:%M:%S')"
+  fi
 }
 
 __ps1_section_left_icon() {

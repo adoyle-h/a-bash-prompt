@@ -18,6 +18,10 @@ It is a part of my [Bash dotfiles framework](https://github.com/adoyle-h/dotfile
 
 ![jobs-labels.png](https://media.githubusercontent.com/media/adoyle-h/_imgs/master/github/a-bash-prompt/jobs-labels.png)
 
+### Bubble Style and Block Style
+
+![bubble-and-block-styles.png](https://media.githubusercontent.com/media/adoyle-h/_imgs/master/github/a-bash-prompt/bubble-and-block-styles.png)
+
 ### Quick preview in container
 
 You can easily preview it in container.
@@ -71,8 +75,13 @@ PROMPT_PS1_LEFT_ICON='⧉ '
 PROMPT_NO_COLOR=0
 PROMPT_ENABLE_HISTORY_APPEND=0
 PROMPT_NO_MODIFY_LSCOLORS=0
-PROMPT_PS1=
+PROMPT_PS1=''                    # If `PROMPT_PS1` set, the PS1 in framework will be override.
 PROMPT_PYTHON_VIRTUALENV_LEFT='venv:'
+
+PROMPT_STYLE_CWD=block          # bubble or block
+PROMPT_STYLE_TIME=block         # bubble or block
+PROMPT_STYLE_EXIT_STATUS=block  # bubble or block
+PROMPT_STYLE_JOB=block          # bubble or block
 
 # See https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
 GIT_PS1_SHOWDIRTYSTATE=1
@@ -102,7 +111,7 @@ You can also disable git-prompt completely by `unset __git_ps1`.
 
 ### Override PS1
 
-If `PROMPT_PS1` set, the PS1 in framework will be override by `PROMPT_PS1`.
+If `PROMPT_PS1` set, the PS1 in framework will be override.
 
 ```sh
 PROMPT_PS1='\u@\h:\w\$ '
