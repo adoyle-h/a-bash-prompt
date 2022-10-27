@@ -72,7 +72,6 @@ Belows are default options:
 ```sh
 PROMPT_PS1_SIGNATURE=𝕬
 PROMPT_PS1_LEFT_ICON='⧉ '
-PROMPT_NO_COLOR=0
 PROMPT_ENABLE_HISTORY_APPEND=0
 PROMPT_NO_MODIFY_LSCOLORS=0
 PROMPT_PS1=''                    # If `PROMPT_PS1` set, the PS1 in framework will be override.
@@ -82,6 +81,16 @@ PROMPT_STYLE_CWD=block          # bubble or block
 PROMPT_STYLE_TIME=block         # bubble or block
 PROMPT_STYLE_EXIT_STATUS=block  # bubble or block
 PROMPT_STYLE_JOB=block          # bubble or block
+
+PROMPT_NO_COLOR=0
+# Available colors: RED GREEN YELLOW BLUE PURPLE CYAN WHITE GREY
+PROMPT_COLOR_CWD=GREEN
+PROMPT_COLOR_TIME=YELLOW
+PROMPT_COLOR_EXIT_STATUS=RED
+PROMPT_COLOR_JOB=CYAN
+PROMPT_COLOR_LEFT_ICON=GREEN
+PROMPT_COLOR_SIGNATURE=GREEN
+PROMPT_COLOR_GIT=BLUE
 
 # See https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
 GIT_PS1_SHOWDIRTYSTATE=1
@@ -94,6 +103,8 @@ GIT_PS1_STATESEPARATOR=' '
 ```
 
 You can set the variables to override defaults before source `a.prompt.bash`.
+
+You can modify `PROMPT_NO_COLOR`, `PROMPT_COLOR_*` and `PROMPT_STYLE_*` variables to change the display in runtime.
 
 ### Git-prompt is slow
 
@@ -152,15 +163,16 @@ For more information on SemVer, please visit http://semver.org/.
 
 ## Copyright and License
 
-Copyright (c) 2019-2020 ADoyle. The project is licensed under the **BSD 3-clause License**.
+Copyright 2019-2022 ADoyle (adoyle.h@gmail.com) Some Rights Reserved. The project is licensed under the **BSD 3-clause License**.
 
 See the [LICENSE][] file for the specific language governing permissions and limitations under the License.
 
 See the [NOTICE][] file distributed with this work for additional information regarding copyright ownership.
 
-## Related Projects
+## Other Projects
 
 - [shell-general-colors](https://github.com/adoyle-h/shell-general-colors): To generate [colors.bash](./colors.bash).
+- [Other shell projects](https://github.com/adoyle-h?tab=repositories&q=&type=source&language=shell&sort=stargazers) created by me.
 
 <!-- links -->
 
