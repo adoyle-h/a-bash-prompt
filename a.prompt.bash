@@ -165,7 +165,7 @@ __ps1_section_jobs() {
         "${fg}" \
         "${__prompt_colors[BG_${PROMPT_COLOR_JOB}]}${__prompt_colors[BLACK]}" \
         "Jobs ${running:-0}|${stopped:-0}" \
-        "${__prompt_colors[BG_BLACK]}${fg}"
+        "${__prompt_colors[RESET_BG]}${fg}"
     else
       printf '%b[%b%s%b]' \
         "${__prompt_colors[GREY]}" \
@@ -184,7 +184,7 @@ __ps1_section_time() {
       "${fg}" \
       "${__prompt_colors[BG_${PROMPT_COLOR_TIME}]}${__prompt_colors[BLACK]}" \
       "T$(date +'%H:%M:%S')" \
-      "${__prompt_colors[BG_BLACK]}${fg}"
+      "${__prompt_colors[RESET_BG]}${fg}"
   else
     printf '%b[%s]' "${fg}" "T$(date +'%H:%M:%S')"
   fi
@@ -198,12 +198,11 @@ __ps1_section_cwd() {
   local fg="${__prompt_colors[$PROMPT_COLOR_CWD]}"
 
   if [[ $PROMPT_STYLE_CWD == bubble ]]; then
-    printf '%b%b%s%b%b' \
+    printf '%b%b%s%b' \
       "${fg}" \
       "${__prompt_colors[BG_${PROMPT_COLOR_CWD}]}${__prompt_colors[BLACK]}" \
       "$(pwd)" \
-      "${__prompt_colors[BG_BLACK]}${fg}" \
-      "${__prompt_colors[RESET_ALL]}"
+      "${__prompt_colors[RESET_BG]}${fg}"
   else
     printf '%b[ %b%s %b]' "${__prompt_colors[GREY]}" "${fg}" "$(pwd)" "${__prompt_colors[GREY]}"
   fi
