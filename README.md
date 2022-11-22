@@ -82,6 +82,11 @@ PROMPT_STYLE_TIME=block         # bubble or block
 PROMPT_STYLE_EXIT_STATUS=block  # bubble or block
 PROMPT_STYLE_JOB=block          # bubble or block
 
+PROMPT_FORMAT_CWD='%s'
+PROMPT_FORMAT_TIME='T%s'        # You can set ' %s'
+PROMPT_FORMAT_EXIT_STATUS='😱 %s'
+PROMPT_FORMAT_JOB='Jobs %s'
+
 PROMPT_NO_COLOR=0
 # Available colors: RED GREEN YELLOW BLUE PURPLE CYAN WHITE GREY
 PROMPT_COLOR_CWD=GREEN

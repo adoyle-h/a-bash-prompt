@@ -21,6 +21,10 @@ PROMPT_NO_COLOR=${PROMPT_NO_COLOR:-0}
 PROMPT_NO_MODIFY_LSCOLORS=${PROMPT_NO_MODIFY_LSCOLORS:-0}
 PROMPT_ENABLE_HISTORY_APPEND=${PROMPT_ENABLE_HISTORY_APPEND:-0}
 PROMPT_PYTHON_VIRTUALENV_LEFT=${PROMPT_PYTHON_VIRTUALENV_LEFT:-venv:}
+PROMPT_FORMAT_CWD=${PROMPT_FORMAT_CWD:-'%s'}
+PROMPT_FORMAT_TIME=${PROMPT_FORMAT_TIME:-'T%s'}
+PROMPT_FORMAT_EXIT_STATUS=${PROMPT_FORMAT_EXIT_STATUS:-'😱 %s'}
+PROMPT_FORMAT_JOB=${PROMPT_FORMAT_JOB:-'Jobs %s'}
 
 # Set empty string to disable, set non-empty string to enable GIT_ options
 GIT_PS1_SHOWDIRTYSTATE=${GIT_PS1_SHOWDIRTYSTATE:-1}
@@ -142,13 +146,13 @@ __ps1_section_exit_status() {
 
   if [[ $exit_status != 0 ]]; then
     if [[ $PROMPT_STYLE_EXIT_STATUS == bubble ]]; then
-      printf '%b%b%s%b' \
+      printf "%b%b$PROMPT_FORMAT_EXIT_STATUS%b" \
         "${fg}" \
         "${__prompt_colors[BG_${PROMPT_COLOR_EXIT_STATUS}]}${__prompt_colors[BLACK]}" \
-        "😱 $exit_status" \
+        "$exit_status" \
         "${__prompt_colors[BG_BLACK]}${fg}"
     else
-      printf '%b' "${fg}[😱 $exit_status]"
+      printf "%b[$PROMPT_FORMAT_EXIT_STATUS]" "${fg}" "$exit_status"
     fi
   fi
 }
@@ -161,16 +165,16 @@ __ps1_section_jobs() {
 
   if ((running > 0)) || ((stopped > 0)); then
     if [[ $PROMPT_STYLE_JOB == bubble ]]; then
-      printf '%b%b%s%b' \
+      printf "%b%b$PROMPT_FORMAT_JOB%b" \
         "${fg}" \
         "${__prompt_colors[BG_${PROMPT_COLOR_JOB}]}${__prompt_colors[BLACK]}" \
-        "Jobs ${running:-0}|${stopped:-0}" \
+        "${running:-0}|${stopped:-0}" \
         "${__prompt_colors[RESET_BG]}${fg}"
     else
-      printf '%b[%b%s%b]' \
+      printf "%b[%b$PROMPT_FORMAT_JOB%b]" \
         "${__prompt_colors[GREY]}" \
         "${fg}" \
-        "Jobs ${running:-0}|${stopped:-0}" \
+        "${running:-0}|${stopped:-0}" \
         "${__prompt_colors[GREY]}"
     fi
   fi
@@ -180,13 +184,13 @@ __ps1_section_time() {
   local fg="${__prompt_colors[${PROMPT_COLOR_TIME}]}"
 
   if [[ $PROMPT_STYLE_TIME == bubble ]]; then
-    printf '%b%b%s%b' \
+    printf "%b%b$PROMPT_FORMAT_TIME%b" \
       "${fg}" \
       "${__prompt_colors[BG_${PROMPT_COLOR_TIME}]}${__prompt_colors[BLACK]}" \
-      "T$(date +'%H:%M:%S')" \
+      "$(date +'%H:%M:%S')" \
       "${__prompt_colors[RESET_BG]}${fg}"
   else
-    printf '%b[%s]' "${fg}" "T$(date +'%H:%M:%S')"
+    printf "%b[$PROMPT_FORMAT_TIME]" "${fg}" "$(date +'%H:%M:%S')"
   fi
 }
 
@@ -198,13 +202,13 @@ __ps1_section_cwd() {
   local fg="${__prompt_colors[$PROMPT_COLOR_CWD]}"
 
   if [[ $PROMPT_STYLE_CWD == bubble ]]; then
-    printf '%b%b%s%b' \
+    printf "%b%b$PROMPT_FORMAT_CWD%b" \
       "${fg}" \
       "${__prompt_colors[BG_${PROMPT_COLOR_CWD}]}${__prompt_colors[BLACK]}" \
       "$(pwd)" \
       "${__prompt_colors[RESET_BG]}${fg}"
   else
-    printf '%b[ %b%s %b]' "${__prompt_colors[GREY]}" "${fg}" "$(pwd)" "${__prompt_colors[GREY]}"
+    printf "%b[ %b$PROMPT_FORMAT_CWD %b]" "${__prompt_colors[GREY]}" "${fg}" "$(pwd)" "${__prompt_colors[GREY]}"
   fi
 }
 
