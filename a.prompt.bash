@@ -110,7 +110,7 @@ __prompt_check_precmd_conflict() {
 __prompt_append() {
   local prompt_re
 
-  if [ "${__bp_imported:-}" == "defined" ]; then
+  if [[ -n "${bash_preexec_imported:-}" ]]; then
     # We are using bash-preexec
     if ! __prompt_check_precmd_conflict "${1}"; then
       precmd_functions+=("${1}")
