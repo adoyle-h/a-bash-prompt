@@ -4,35 +4,9 @@
 [[ -z "$PS1" ]] && return
 
 # Set 0 to disable, set 1 to enable PROMPT_ options
-PROMPT_PS1_LEFT_ICON=${PROMPT_PS1_LEFT_ICON:-'⧉ '}
-PROMPT_STYLE_CWD=${PROMPT_STYLE_CWD:-block}                 # bubble or block
-PROMPT_STYLE_TIME=${PROMPT_STYLE_TIME:-block}               # bubble or block
-PROMPT_STYLE_EXIT_STATUS=${PROMPT_STYLE_EXIT_STATUS:-block} # bubble or block
-PROMPT_STYLE_JOB=${PROMPT_STYLE_JOB:-block}                 # bubble or block
 PROMPT_COLOR_BG=${PROMPT_COLOR_BG:-BLACK}
-PROMPT_COLOR_CWD=${PROMPT_COLOR_CWD:-GREEN}
-PROMPT_COLOR_TIME=${PROMPT_COLOR_TIME:-YELLOW}
-PROMPT_COLOR_EXIT_STATUS=${PROMPT_COLOR_EXIT_STATUS:-RED}
-PROMPT_COLOR_JOB=${PROMPT_COLOR_JOB:-CYAN}
-PROMPT_COLOR_LEFT_ICON=${PROMPT_COLOR_LEFT_ICON:-GREEN}
-PROMPT_COLOR_GIT=${PROMPT_COLOR_GIT:-BLUE}
 PROMPT_NO_COLOR=${PROMPT_NO_COLOR:-0}
 PROMPT_NO_MODIFY_LSCOLORS=${PROMPT_NO_MODIFY_LSCOLORS:-0}
-PROMPT_ENABLE_HISTORY_APPEND=${PROMPT_ENABLE_HISTORY_APPEND:-0}
-PROMPT_PYTHON_VIRTUALENV_LEFT=${PROMPT_PYTHON_VIRTUALENV_LEFT:-venv:}
-PROMPT_FORMAT_CWD=${PROMPT_FORMAT_CWD:-'%s'}
-PROMPT_FORMAT_TIME=${PROMPT_FORMAT_TIME:-'T%s'}
-PROMPT_FORMAT_EXIT_STATUS=${PROMPT_FORMAT_EXIT_STATUS:-'😱 %s'}
-PROMPT_FORMAT_JOB=${PROMPT_FORMAT_JOB:-'Jobs %s'}
-
-# Set empty string to disable, set non-empty string to enable GIT_ options
-GIT_PS1_SHOWDIRTYSTATE=${GIT_PS1_SHOWDIRTYSTATE:-1}
-GIT_PS1_SHOWSTASHSTATE=${GIT_PS1_SHOWSTASHSTATE:-1}
-GIT_PS1_SHOWUNTRACKEDFILES=${GIT_PS1_SHOWUNTRACKEDFILES:-1}
-GIT_PS1_SHOWCOLORHINTS=${GIT_PS1_SHOWCOLORHINTS:-true}
-GIT_PS1_SHOWUPSTREAM=${GIT_PS1_SHOWUPSTREAM:-git}
-GIT_PS1_DESCRIBE_STYLE=${GIT_PS1_DESCRIBE_STYLE:-branch}
-GIT_PS1_STATESEPARATOR=${GIT_PS1_STATESEPARATOR:-' '}
 
 if [[ "$PROMPT_NO_COLOR" != 1 ]]; then
   export CLICOLOR=1
@@ -138,47 +112,6 @@ __prompt_append() {
 #                         Section Definitions                         #
 #######################################################################
 
-__ps1_section_exit_status() {
-  local exit_status=$__ps1_last_exit_status
-
-  local fg="${__prompt_colors[${PROMPT_COLOR_EXIT_STATUS}]}"
-
-  if [[ $exit_status != 0 ]]; then
-    if [[ $PROMPT_STYLE_EXIT_STATUS == bubble ]]; then
-      printf "%b%b$PROMPT_FORMAT_EXIT_STATUS%b" \
-        "${fg}" \
-        "${__prompt_colors[BG_${PROMPT_COLOR_EXIT_STATUS}]}${__prompt_colors[$PROMPT_COLOR_BG]}" \
-        "$exit_status" \
-        "${__prompt_colors[BG_${PROMPT_COLOR_BG}]}${fg}"
-    else
-      printf "%b[$PROMPT_FORMAT_EXIT_STATUS]" "${fg}" "$exit_status"
-    fi
-  fi
-}
-
-__ps1_section_jobs() {
-  local stopped=$(jobs -sp | wc -l | tr -d ' ')
-  local running=$(jobs -rp | wc -l | tr -d ' ')
-
-  local fg="${__prompt_colors[${PROMPT_COLOR_JOB}]}"
-
-  if ((running > 0)) || ((stopped > 0)); then
-    if [[ $PROMPT_STYLE_JOB == bubble ]]; then
-      printf "%b%b$PROMPT_FORMAT_JOB%b" \
-        "${fg}" \
-        "${__prompt_colors[BG_${PROMPT_COLOR_JOB}]}${__prompt_colors[BLACK]}" \
-        "${running:-0}|${stopped:-0}" \
-        "${__prompt_colors[RESET_BG]}${fg}"
-    else
-      printf "%b[%b$PROMPT_FORMAT_JOB%b]" \
-        "${__prompt_colors[GREY]}" \
-        "${fg}" \
-        "${running:-0}|${stopped:-0}" \
-        "${__prompt_colors[GREY]}"
-    fi
-  fi
-}
-
 # PROMPT_STYLE_SECTION=square|bubble|block|none
 # PROMPT_COLOR_SECTION=BLACK|WHITE|YELLOW|CYAN|BLUE|GREEN|GREY|RED|PURPLE
 # PROMPT_FORMAT_SECTION='%s'
@@ -201,64 +134,97 @@ __ps1_print_section() {
       "${__prompt_colors[BG_${color}]}${__prompt_colors[$PROMPT_COLOR_BG]}" \
       "$value" \
       "${__prompt_colors[RESET_BG]}${fg}"
-  else
+  elif [[ $style == block ]]; then
     printf "%b[$format]" "${fg}" "$value"
+  else
+    printf "%b$format" "${fg}" "$value"
+  fi
+}
+
+__ps1_section_exit_status() {
+  [[ ${PROMPT_ENABLE_JOB:-1} == 0 ]] && return
+
+  local exit_status=$__ps1_last_exit_status
+
+  if [[ $exit_status != 0 ]]; then
+    local PROMPT_STYLE_EXIT_STATUS=${PROMPT_STYLE_EXIT_STATUS:-block}
+    local PROMPT_COLOR_EXIT_STATUS=${PROMPT_COLOR_EXIT_STATUS:-RED}
+    local PROMPT_FORMAT_EXIT_STATUS=${PROMPT_FORMAT_EXIT_STATUS:-'😱 %s'}
+    __ps1_print_section EXIT_STATUS "$exit_status"
+  fi
+}
+
+__ps1_section_jobs() {
+  [[ ${PROMPT_ENABLE_JOB:-1} == 0 ]] && return
+
+  local stopped=$(jobs -sp | wc -l | tr -d ' ')
+  local running=$(jobs -rp | wc -l | tr -d ' ')
+
+  if ((running > 0)) || ((stopped > 0)); then
+    local PROMPT_STYLE_JOB=${PROMPT_STYLE_JOB:-block}
+    local PROMPT_COLOR_JOB=${PROMPT_COLOR_JOB:-CYAN}
+    local PROMPT_FORMAT_JOB=${PROMPT_FORMAT_JOB:-'Jobs %s'}
+    __ps1_print_section JOB "${running:-0}|${stopped:-0}"
   fi
 }
 
 __ps1_section_hostname() {
-  local PROMPT_ENABLE_HOSTNAME=${PROMPT_ENABLE_HOSTNAME:-0}
-  [[ $PROMPT_ENABLE_HOSTNAME == 0 ]] && return
-  local PROMPT_STYLE_HOSTNAME=${PROMPT_STYLE_HOSTNAME:-square}  # square or bubble or block
+  [[ ${PROMPT_ENABLE_HOSTNAME:-0} == 0 ]] && return
+  local PROMPT_STYLE_HOSTNAME=${PROMPT_STYLE_HOSTNAME:-square}
   local PROMPT_COLOR_HOSTNAME=${PROMPT_COLOR_HOSTNAME:-PURPLE}
   local PROMPT_FORMAT_HOSTNAME=${PROMPT_FORMAT_HOSTNAME:-'%s'}
   __ps1_print_section HOSTNAME "$HOSTNAME"
 }
 
 __ps1_section_user() {
-  local PROMPT_ENABLE_USER=${PROMPT_ENABLE_USER:-0}
-  [[ $PROMPT_ENABLE_USER == 0 ]] && return
-  local PROMPT_STYLE_USER=${PROMPT_STYLE_USER:-square}  # square or bubble or block
+  [[ ${PROMPT_ENABLE_USER:-0} == 0 ]] && return
+  local PROMPT_STYLE_USER=${PROMPT_STYLE_USER:-square}
   local PROMPT_COLOR_USER=${PROMPT_COLOR_USER:-CYAN}
   local PROMPT_FORMAT_USER=${PROMPT_FORMAT_USER:-'%s'}
   __ps1_print_section USER "$USER"
 }
 
 __ps1_section_time() {
-  local fg="${__prompt_colors[${PROMPT_COLOR_TIME}]}"
-
-  if [[ $PROMPT_STYLE_TIME == bubble ]]; then
-    printf "%b%b$PROMPT_FORMAT_TIME%b" \
-      "${fg}" \
-      "${__prompt_colors[BG_${PROMPT_COLOR_TIME}]}${__prompt_colors[BLACK]}" \
-      "$(date +'%H:%M:%S')" \
-      "${__prompt_colors[RESET_BG]}${fg}"
-  else
-    printf "%b[$PROMPT_FORMAT_TIME]" "${fg}" "$(date +'%H:%M:%S')"
-  fi
+  [[ ${PROMPT_ENABLE_TIME:-1} == 0 ]] && return
+  local PROMPT_STYLE_TIME=${PROMPT_STYLE_TIME:-block}
+  local PROMPT_COLOR_TIME=${PROMPT_COLOR_TIME:-YELLOW}
+  local PROMPT_FORMAT_TIME=${PROMPT_FORMAT_TIME:-'T%s'}
+  __ps1_print_section TIME "$(date +'%H:%M:%S')"
 }
 
 __ps1_section_left_icon() {
-  printf "%b" "${__prompt_colors[$PROMPT_COLOR_LEFT_ICON]}${PROMPT_PS1_LEFT_ICON}"
+  [[ ${PROMPT_ENABLE_LEFT_ICON:-1} == 0 ]] && return
+  local PROMPT_STYLE_LEFT_ICON=${PROMPT_STYLE_LEFT_ICON:-none}
+  local PROMPT_COLOR_LEFT_ICON=${PROMPT_COLOR_LEFT_ICON:-GREEN}
+  local PROMPT_FORMAT_LEFT_ICON=${PROMPT_FORMAT_LEFT_ICON:-'%s '}
+  __ps1_print_section LEFT_ICON "${PROMPT_PS1_LEFT_ICON:-⧉}"
 }
 
 __ps1_section_cwd() {
-  local fg="${__prompt_colors[$PROMPT_COLOR_CWD]}"
-
-  if [[ $PROMPT_STYLE_CWD == bubble ]]; then
-    printf "%b%b$PROMPT_FORMAT_CWD%b" \
-      "${fg}" \
-      "${__prompt_colors[BG_${PROMPT_COLOR_CWD}]}${__prompt_colors[BLACK]}" \
-      "$(pwd)" \
-      "${__prompt_colors[RESET_BG]}${fg}"
-  else
-    printf "%b[ %b$PROMPT_FORMAT_CWD %b]" "${__prompt_colors[GREY]}" "${fg}" "$(pwd)" "${__prompt_colors[GREY]}"
-  fi
+  [[ ${PROMPT_ENABLE_CWD:-1} == 0 ]] && return
+  local PROMPT_STYLE_CWD=${PROMPT_STYLE_CWD:-block}
+  local PROMPT_COLOR_CWD=${PROMPT_COLOR_CWD:-GREEN}
+  local PROMPT_FORMAT_CWD=${PROMPT_FORMAT_CWD:-' %s '}
+  __ps1_print_section CWD "$PWD"
 }
 
 __ps1_section_git() {
+  [[ ${PROMPT_ENABLE_GIT:-1} == 0 ]] && return
+
   if command -v __git_ps1 &>/dev/null; then
-    printf '%b' "${__prompt_colors[$PROMPT_COLOR_GIT]}$(__git_ps1 " (%s)")"
+    # Set empty string to disable, set non-empty string to enable GIT_ options
+    local GIT_PS1_SHOWDIRTYSTATE=${GIT_PS1_SHOWDIRTYSTATE:-1}
+    local GIT_PS1_SHOWSTASHSTATE=${GIT_PS1_SHOWSTASHSTATE:-1}
+    local GIT_PS1_SHOWUNTRACKEDFILES=${GIT_PS1_SHOWUNTRACKEDFILES:-1}
+    local GIT_PS1_SHOWCOLORHINTS=${GIT_PS1_SHOWCOLORHINTS:-true}
+    local GIT_PS1_SHOWUPSTREAM=${GIT_PS1_SHOWUPSTREAM:-git}
+    local GIT_PS1_DESCRIBE_STYLE=${GIT_PS1_DESCRIBE_STYLE:-branch}
+    local GIT_PS1_STATESEPARATOR=${GIT_PS1_STATESEPARATOR:-' '}
+
+    local PROMPT_COLOR_GIT=${PROMPT_COLOR_GIT:-BLUE}
+    local PROMPT_STYLE_GIT=${PROMPT_STYLE_GIT:-none}
+    local PROMPT_FORMAT_GIT=${PROMPT_FORMAT_GIT:-'%b'}
+    __ps1_print_section GIT "$(__git_ps1 "(%s)")"
   fi
 }
 
@@ -266,7 +232,7 @@ __ps1_section_indicator() {
   [[ ${PROMPT_ENABLE_INDICATOR:-1} == 0 ]] && return
   local PROMPT_STYLE_INDICATOR=${PROMPT_STYLE_INDICATOR:-none}
   local PROMPT_COLOR_INDICATOR=${PROMPT_COLOR_INDICATOR:-GREEN}
-  local PROMPT_FORMAT_INDICATOR=${PROMPT_FORMAT_INDICATOR:-'%s'}
+  local PROMPT_FORMAT_INDICATOR=${PROMPT_FORMAT_INDICATOR:-'%s '}
   __ps1_print_section INDICATOR "${PROMPT_PS1_INDICATOR:-𝕬}"
 }
 
@@ -312,8 +278,13 @@ __ps1_section_reset_text() {
 }
 
 __ps1_section_python_virtualenv() {
+  [[ ${PROMPT_ENABLE_PYTHON_VENV:-1} == 0 ]] && return
+
   if [[ -n "$VIRTUAL_ENV" ]]; then
-    printf '%b%s' "${__prompt_colors[PURPLE]}" "[$PROMPT_PYTHON_VIRTUALENV_LEFT ${VIRTUAL_ENV##*/}]"
+    local PROMPT_STYLE_PYTHON_VENV=${PROMPT_STYLE_PYTHON_VENV:-block}
+    local PROMPT_COLOR_PYTHON_VENV=${PROMPT_COLOR_PYTHON_VENV:-PURPLE}
+    local PROMPT_FORMAT_PYTHON_VENV=${PROMPT_FORMAT_PYTHON_VENV:-'%s'}
+    __ps1_print_section PYTHON_VENV "${PROMPT_PYTHON_VIRTUALENV_LEFT:-venv:} ${VIRTUAL_ENV##*/}"
   fi
 }
 
@@ -322,7 +293,8 @@ __ps1_section_python_virtualenv() {
 #######################################################################
 
 __ps1_command_append_history() {
-  [[ $PROMPT_ENABLE_HISTORY_APPEND == 1 ]] && history -a
+  [[ ${PROMPT_ENABLE_HISTORY_APPEND:-0} == 0 ]] && return
+  history -a
 }
 
 #######################################################################
@@ -357,7 +329,7 @@ __prompt_command() {
     local right="$(__ps1_right)"
     local left="$(__ps1_left)"
     local middle="$(__ps1_section_fill_middle_spaces "${left}" "${right}")"
-    local main=$(__ps1_main)
+    local main="$(__ps1_main)"
     local _PS1="${left:-}${middle:-}${right:-}\\n$(__prompt_wrap_color "$main") "
 
     if [[ $PROMPT_NO_COLOR == 1 ]]; then
