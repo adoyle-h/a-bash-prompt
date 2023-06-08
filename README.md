@@ -2,6 +2,8 @@
 
 A Bash prompt written by pure Bash script. Make Bash great again!
 
+All prompt sections are configurable, extendable and easy to use.
+
 ## Preview
 
 ### Responsive prompt (Auto fit to window width).
@@ -43,7 +45,7 @@ You can easily preview it in container.
 |:---------:|:---------|:--------|:-----------------------------------|
 |     ✅    | MacOS    | *       | -                                  |
 |     ✅    | Linux    | *       | -                                  |
-|     ❔    | BSD      | -       | Not tested yet. Maybe not support. |
+|     ✅    | BSD      | *       | -                                  |
 |     🚫    | Windows  | -       | Never and ever supported.          |
 
 ### Supported Shells
@@ -67,40 +69,98 @@ git clone https://github.com/adoyle-h/a-bash-prompt.git
 echo "source $PWD/a-bash-prompt/a.prompt.bash" > ~/.bahsrc
 ```
 
-## Advanced Usage
+## Default Options
 
-### Default options
+You can set these variables before and after `source a.prompt.bash` to override defaults options.
 
-Belows are default options:
+You can modify `PROMPT_NO_COLOR`, `PROMPT_COLOR_*` and `PROMPT_STYLE_*` variables to change the display in runtime.
+
+Available colors: RED GREEN YELLOW BLUE PURPLE CYAN WHITE BLACK GREY
+Available styles: bubble block square none
+(Case-sensitive)
+
+Belows are default options.
+
+### Others
 
 ```sh
-PROMPT_PS1_SIGNATURE=𝕬
-PROMPT_PS1_LEFT_ICON='⧉ '
-PROMPT_ENABLE_HISTORY_APPEND=0
+PROMPT_NO_COLOR=0               # If set 1, no color printed
 PROMPT_NO_MODIFY_LSCOLORS=0
-PROMPT_PS1=''                    # If `PROMPT_PS1` set, the PS1 in framework will be override.
-PROMPT_PYTHON_VIRTUALENV_LEFT='venv:'
+PROMPT_PS1=''                   # If `PROMPT_PS1` is not empty, the PS1 in framework will be override.
+```
 
-PROMPT_STYLE_CWD=block          # bubble or block
-PROMPT_STYLE_TIME=block         # bubble or block
-PROMPT_STYLE_EXIT_STATUS=block  # bubble or block
-PROMPT_STYLE_JOB=block          # bubble or block
+### Layout
 
-PROMPT_FORMAT_CWD='%s'
-PROMPT_FORMAT_TIME='T%s'        # You can set ' %s'
-PROMPT_FORMAT_EXIT_STATUS='😱 %s'
-PROMPT_FORMAT_JOB='Jobs %s'
+You can rearrange the layout.
 
-PROMPT_NO_COLOR=0
-# Available colors: RED GREEN YELLOW BLUE PURPLE CYAN WHITE GREY
-PROMPT_COLOR_CWD=GREEN
+```sh
+PROMPT_LAYOUT_RIGHT=( exit_status jobs python_virtualenv time )
+PROMPT_LAYOUT_LEFT=( left_icon user hostname cwd )
+PROMPT_LAYOUT_MAIN=( indicator git reset_text )
+```
+
+### Time Clock
+
+```sh
+PROMPT_ENABLE_TIME=1
+PROMPT_STYLE_TIME=block
 PROMPT_COLOR_TIME=YELLOW
-PROMPT_COLOR_EXIT_STATUS=RED
-PROMPT_COLOR_JOB=CYAN
-PROMPT_COLOR_LEFT_ICON=GREEN
-PROMPT_COLOR_SIGNATURE=GREEN
-PROMPT_COLOR_GIT=BLUE
+PROMPT_FORMAT_TIME='T%s'        # You can set ' %s'
+PROMPT_PS1_TIME_DATE_FORMAT='+%H:%M:%S' # date +%H:%M:%S
+```
 
+### Front and Backgound Jobs
+
+```sh
+PROMPT_ENABLE_JOB=1
+PROMPT_STYLE_JOB=block
+PROMPT_COLOR_JOB=CYAN
+PROMPT_FORMAT_JOB='Jobs %s'
+```
+
+### Process Exit Status Code
+
+```sh
+PROMPT_ENABLE_EXIT_STATUS=1
+PROMPT_STYLE_EXIT_STATUS=block
+PROMPT_COLOR_EXIT_STATUS=RED
+PROMPT_FORMAT_EXIT_STATUS='😱 %s'
+```
+
+### Current Work Directory
+
+```sh
+PROMPT_ENABLE_CWD=1
+PROMPT_STYLE_CWD=block
+PROMPT_COLOR_CWD=GREEN
+PROMPT_FORMAT_CWD=' %s '
+```
+
+### Current User
+
+```sh
+PROMPT_ENABLE_USER=0
+PROMPT_STYLE_USER=square
+PROMPT_COLOR_USER=CYAN
+PROMPT_FORMAT_USER='%s'
+```
+
+### Hostname
+
+```sh
+PROMPT_ENABLE_HOSTNAME=0
+PROMPT_STYLE_HOSTNAME=square
+PROMPT_COLOR_HOSTNAME=PURPLE
+PROMPT_FORMAT_HOSTNAME='%s'
+```
+
+### Git branch and status
+
+```sh
+PROMPT_ENABLE_GIT=1
+PROMPT_COLOR_GIT=BLUE
+PROMPT_STYLE_GIT=none
+PROMPT_FORMAT_GIT='%b'
 # See https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
 GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWSTASHSTATE=1
@@ -111,9 +171,63 @@ GIT_PS1_DESCRIBE_STYLE=branch
 GIT_PS1_STATESEPARATOR=' '
 ```
 
-You can set the variables to override defaults before source `a.prompt.bash`.
+### Python Virtual Environment
 
-You can modify `PROMPT_NO_COLOR`, `PROMPT_COLOR_*` and `PROMPT_STYLE_*` variables to change the display in runtime.
+```sh
+PROMPT_ENABLE_PYTHON_VENV=1
+PROMPT_STYLE_PYTHON_VENV=block
+PROMPT_COLOR_PYTHON_VENV=PURPLE
+PROMPT_FORMAT_PYTHON_VENV='%s'
+PROMPT_PYTHON_VIRTUALENV_LEFT='venv:'
+```
+
+### Left Icon
+
+```sh
+PROMPT_ENABLE_LEFT_ICON=1
+PROMPT_STYLE_LEFT_ICON=none
+PROMPT_COLOR_LEFT_ICON=GREEN
+PROMPT_FORMAT_LEFT_ICON='%s '
+PROMPT_PS1_LEFT_ICON='⧉ '
+```
+
+### Indicator
+
+```sh
+PROMPT_ENABLE_INDICATOR=1
+PROMPT_STYLE_INDICATOR=none
+PROMPT_COLOR_INDICATOR=GREEN
+PROMPT_FORMAT_INDICATOR='%s '
+PROMPT_PS1_INDICATOR='𝕬'
+```
+
+### History Append
+
+call `history -a` each time.
+
+```sh
+PROMPT_ENABLE_HISTORY_APPEND=0
+```
+
+## Advanced Usage
+
+### Write section to extend prompt
+
+```sh
+__ps1_section_hello() {
+  [[ ${PROMPT_ENABLE_HELLO:-1} == 0 ]] && return
+  local PROMPT_STYLE_HELLO=${PROMPT_STYLE_HELLO:-block}
+  local PROMPT_COLOR_HELLO=${PROMPT_COLOR_HELLO:-GREEN}
+  local PROMPT_FORMAT_HELLO=${PROMPT_FORMAT_HELLO:-'%s'}
+  __ps1_print_section HELLO "hello world"
+}
+
+PROMPT_LAYOUT_RIGHT+=( hello )
+```
+
+Then you will get these.
+
+![write-your-section.png](https://media.githubusercontent.com/media/adoyle-h/_imgs/master/github/a-bash-prompt/write-your-section.png)
 
 ### Git-prompt is slow
 
