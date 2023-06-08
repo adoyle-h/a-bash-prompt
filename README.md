@@ -59,7 +59,7 @@ You can easily preview it in container.
 
 ## Versions
 
-Read [tags][].
+See [releases][].
 The versions follows the rules of [SemVer 2.0.0](http://semver.org/).
 
 ## Install
@@ -294,4 +294,4 @@ See the [NOTICE][] file distributed with this work for additional information re
 
 [LICENSE]: ./LICENSE
 [NOTICE]: ./NOTICE
-[tags]: https://github.com/adoyle-h/a-bash-prompt/tags
+[releases]: https://github.com/adoyle-h/a-bash-prompt/releases
