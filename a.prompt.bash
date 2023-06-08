@@ -214,6 +214,15 @@ __ps1_section_hostname() {
   __ps1_print_section HOSTNAME "$HOSTNAME"
 }
 
+__ps1_section_user() {
+  local PROMPT_ENABLE_USER=${PROMPT_ENABLE_USER:-0}
+  [[ $PROMPT_ENABLE_USER == 0 ]] && return
+  local PROMPT_STYLE_USER=${PROMPT_STYLE_USER:-square}  # square or bubble or block
+  local PROMPT_COLOR_USER=${PROMPT_COLOR_USER:-CYAN}
+  local PROMPT_FORMAT_USER=${PROMPT_FORMAT_USER:-'%s'}
+  __ps1_print_section USER "$USER"
+}
+
 __ps1_section_time() {
   local fg="${__prompt_colors[${PROMPT_COLOR_TIME}]}"
 
@@ -324,6 +333,7 @@ __ps1_right() {
 
 __ps1_left() {
   __ps1_section_left_icon
+  __ps1_section_user
   __ps1_section_hostname
   __ps1_section_cwd
 }
