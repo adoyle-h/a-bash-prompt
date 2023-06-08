@@ -8,6 +8,16 @@ PROMPT_COLOR_BG=${PROMPT_COLOR_BG:-BLACK}
 PROMPT_NO_COLOR=${PROMPT_NO_COLOR:-0}
 PROMPT_NO_MODIFY_LSCOLORS=${PROMPT_NO_MODIFY_LSCOLORS:-0}
 
+if ! declare -p PROMPT_LAYOUT_RIGHT &>/dev/null ; then
+  PROMPT_LAYOUT_RIGHT=( exit_status jobs python_virtualenv time )
+fi
+if ! declare -p PROMPT_LAYOUT_LEFT &>/dev/null ; then
+  PROMPT_LAYOUT_LEFT=( left_icon user hostname cwd )
+fi
+if ! declare -p PROMPT_LAYOUT_MAIN &>/dev/null ; then
+  PROMPT_LAYOUT_MAIN=( indicator git reset_text )
+fi
+
 if [[ "$PROMPT_NO_COLOR" != 1 ]]; then
   export CLICOLOR=1
 
@@ -302,23 +312,24 @@ __ps1_command_append_history() {
 #######################################################################
 
 __ps1_right() {
-  __ps1_section_exit_status
-  __ps1_section_jobs
-  __ps1_section_python_virtualenv
-  __ps1_section_time
+  local section
+  for section in "${PROMPT_LAYOUT_RIGHT[@]}" ; do
+    "__ps1_section_$section"
+  done
 }
 
 __ps1_left() {
-  __ps1_section_left_icon
-  __ps1_section_user
-  __ps1_section_hostname
-  __ps1_section_cwd
+  local section
+  for section in "${PROMPT_LAYOUT_LEFT[@]}" ; do
+    "__ps1_section_$section"
+  done
 }
 
 __ps1_main() {
-  __ps1_section_indicator
-  __ps1_section_git
-  __ps1_section_reset_text
+  local section
+  for section in "${PROMPT_LAYOUT_MAIN[@]}" ; do
+    "__ps1_section_$section"
+  done
 }
 
 __prompt_command() {
