@@ -199,7 +199,7 @@ __ps1_section_time() {
   local PROMPT_STYLE_TIME=${PROMPT_STYLE_TIME:-block}
   local PROMPT_COLOR_TIME=${PROMPT_COLOR_TIME:-YELLOW}
   local PROMPT_FORMAT_TIME=${PROMPT_FORMAT_TIME:-'T%s'}
-  __ps1_print_section TIME "$(date +'%H:%M:%S')"
+  __ps1_print_section TIME "$(date "${PROMPT_PS1_TIME_DATE_FORMAT:-+%H:%M:%S}")"
 }
 
 __ps1_section_left_icon() {
