@@ -10,6 +10,7 @@ PROMPT_STYLE_CWD=${PROMPT_STYLE_CWD:-block}                 # bubble or block
 PROMPT_STYLE_TIME=${PROMPT_STYLE_TIME:-block}               # bubble or block
 PROMPT_STYLE_EXIT_STATUS=${PROMPT_STYLE_EXIT_STATUS:-block} # bubble or block
 PROMPT_STYLE_JOB=${PROMPT_STYLE_JOB:-block}                 # bubble or block
+PROMPT_COLOR_BG=${PROMPT_COLOR_BG:-BLACK}
 PROMPT_COLOR_CWD=${PROMPT_COLOR_CWD:-GREEN}
 PROMPT_COLOR_TIME=${PROMPT_COLOR_TIME:-YELLOW}
 PROMPT_COLOR_EXIT_STATUS=${PROMPT_COLOR_EXIT_STATUS:-RED}
@@ -148,9 +149,9 @@ __ps1_section_exit_status() {
     if [[ $PROMPT_STYLE_EXIT_STATUS == bubble ]]; then
       printf "%b%b$PROMPT_FORMAT_EXIT_STATUS%b" \
         "${fg}" \
-        "${__prompt_colors[BG_${PROMPT_COLOR_EXIT_STATUS}]}${__prompt_colors[BLACK]}" \
+        "${__prompt_colors[BG_${PROMPT_COLOR_EXIT_STATUS}]}${__prompt_colors[$PROMPT_COLOR_BG]}" \
         "$exit_status" \
-        "${__prompt_colors[BG_BLACK]}${fg}"
+        "${__prompt_colors[BG_${PROMPT_COLOR_BG}]}${fg}"
     else
       printf "%b[$PROMPT_FORMAT_EXIT_STATUS]" "${fg}" "$exit_status"
     fi
@@ -178,6 +179,39 @@ __ps1_section_jobs() {
         "${__prompt_colors[GREY]}"
     fi
   fi
+}
+
+__ps1_print_section() {
+  local -n style=PROMPT_STYLE_$1
+  local -n color=PROMPT_COLOR_$1
+  local -n format=PROMPT_FORMAT_$1
+  local value=$2
+
+  local fg="${__prompt_colors[${color}]}"
+
+  if [[ $style == bubble ]]; then
+    printf "%b%b$format%b" \
+      "${fg}" \
+      "${__prompt_colors[BG_${color}]}${__prompt_colors[$PROMPT_COLOR_BG]}" \
+      "$value" \
+      "${__prompt_colors[RESET_BG]}${fg}"
+  elif [[ $style == square ]]; then
+    printf "%b $format %b" \
+      "${__prompt_colors[BG_${color}]}${__prompt_colors[$PROMPT_COLOR_BG]}" \
+      "$value" \
+      "${__prompt_colors[RESET_BG]}${fg}"
+  else
+    printf "%b[$format]" "${fg}" "$value"
+  fi
+}
+
+__ps1_section_hostname() {
+  local PROMPT_ENABLE_HOSTNAME=${PROMPT_ENABLE_HOSTNAME:-0}
+  [[ $PROMPT_ENABLE_HOSTNAME == 0 ]] && return
+  local PROMPT_STYLE_HOSTNAME=${PROMPT_STYLE_HOSTNAME:-square}  # square or bubble or block
+  local PROMPT_COLOR_HOSTNAME=${PROMPT_COLOR_HOSTNAME:-PURPLE}
+  local PROMPT_FORMAT_HOSTNAME=${PROMPT_FORMAT_HOSTNAME:-'%s'}
+  __ps1_print_section HOSTNAME "$HOSTNAME"
 }
 
 __ps1_section_time() {
@@ -290,6 +324,7 @@ __ps1_right() {
 
 __ps1_left() {
   __ps1_section_left_icon
+  __ps1_section_hostname
   __ps1_section_cwd
 }
 
