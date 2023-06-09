@@ -131,6 +131,8 @@ __ps1_print_section() {
   local -n format=PROMPT_FORMAT_$1
   local value=$2
 
+  [[ -z $value ]] && return
+
   local fg="${__prompt_colors[${color}]}"
 
   if [[ $style == bubble ]]; then
@@ -233,7 +235,7 @@ __ps1_section_git() {
 
     local PROMPT_COLOR_GIT=${PROMPT_COLOR_GIT:-BLUE}
     local PROMPT_STYLE_GIT=${PROMPT_STYLE_GIT:-none}
-    local PROMPT_FORMAT_GIT=${PROMPT_FORMAT_GIT:-'%b'}
+    local PROMPT_FORMAT_GIT=${PROMPT_FORMAT_GIT:-' %b'}
     __ps1_print_section GIT "$(__git_ps1 "(%s)")"
   fi
 }
@@ -242,7 +244,7 @@ __ps1_section_indicator() {
   [[ ${PROMPT_ENABLE_INDICATOR:-1} == 0 ]] && return
   local PROMPT_STYLE_INDICATOR=${PROMPT_STYLE_INDICATOR:-none}
   local PROMPT_COLOR_INDICATOR=${PROMPT_COLOR_INDICATOR:-GREEN}
-  local PROMPT_FORMAT_INDICATOR=${PROMPT_FORMAT_INDICATOR:-'%s '}
+  local PROMPT_FORMAT_INDICATOR=${PROMPT_FORMAT_INDICATOR:-'%s'}
   __ps1_print_section INDICATOR "${PROMPT_PS1_INDICATOR:-𝕬}"
 }
 
